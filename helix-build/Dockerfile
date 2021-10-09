@@ -2,17 +2,17 @@
 # Docker configuration for Build Replica
 # --------------------------------------------------------------------------------
 
-FROM ubuntu:xenial
+FROM ubuntu:focal
 
 LABEL vendor="Perforce Software"
-LABEL maintainer="Paul Allen (pallen@perforce.com)"
+LABEL maintainer="Mehdi Benadel (mehdi.benadel@gmail.com)"
 
 # Update Ubuntu and add Perforce Package Source
 RUN \
   apt-get update && \
-  apt-get install -y wget unzip vim iputils-ping && \
+  DEBIAN_FRONTEND="noninteractive" apt-get install -y wget unzip gnupg iputils-ping && \
   wget -qO - https://package.perforce.com/perforce.pubkey | apt-key add - && \
-  echo "deb http://package.perforce.com/apt/ubuntu xenial release" > /etc/apt/sources.list.d/perforce.list && \
+  echo "deb http://package.perforce.com/apt/ubuntu focal release" > /etc/apt/sources.list.d/perforce.list && \
   apt-get update
 
 # --------------------------------------------------------------------------------
@@ -20,15 +20,15 @@ RUN \
 # --------------------------------------------------------------------------------
 
 # Default Environment
-ARG P4PORT=p4d.helix:1666
-ARG P4NAME=build
-ARG P4TCP=1666
-ARG P4USER=super
-ARG P4PASSWD=Passw0rd
-ARG P4CASE=-C0
-ARG P4CHARSET=utf8
-ARG SERVICEUSER=service
-ARG SERVICEGROUP=unlimited
+ARG P4PORT
+ARG P4NAME
+ARG P4TCP
+ARG P4USER
+ARG P4PASSWD
+ARG P4CASE
+ARG P4CHARSET
+ARG SERVICEUSER
+ARG SERVICEGROUP
 
 # Dynamic Environment
 ENV P4PORT=$P4PORT \
@@ -58,7 +58,7 @@ ENV P4ROOT=$P4HOME/root \
 # --------------------------------------------------------------------------------
 
 # Install Perforce Server
-RUN apt-get install -y helix-p4d
+RUN DEBIAN_FRONTEND="noninteractive" apt-get install -y helix-p4d
 
 # Add external files
 COPY files/clean.sh /usr/local/bin/clean.sh

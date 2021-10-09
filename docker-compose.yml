@@ -9,20 +9,38 @@ services:
     ports:
       - 4000:1666
     volumes:
-      - ./volumes/p4d-home:/p4
+      - ./data/helix-p4d:/p4
     tty: true
+    environment:
+    - P4NAME=$P4NAME
+    - P4TCP=$P4TCP
+    - P4PORT=$P4TCP
+    - P4USER=$P4USER
+    - P4PASSWD=$P4PASSWD
+    - P4CASE=$P4CASE
+    - P4CHARSET=$P4CHARSET
 
-  build.helix:
-    build:
-      context: helix-build
-      dockerfile: Dockerfile
-    hostname: build
-    domainname: helix
-    ports:
-      - 4001:1666
-    depends_on:
-      - p4d.helix
-    tty: true
+  # build.helix:
+  #   build:
+  #     context: helix-build
+  #     dockerfile: Dockerfile
+  #   hostname: build
+  #   domainname: helix
+  #   ports:
+  #     - 4001:1666
+  #   depends_on:
+  #     - p4d.helix
+  #   tty: true
+  #   environment:
+  #    - P4NAME=$P4NAME
+  #    - P4PORT=$P4PORT
+  #    - P4TCP=$P4TCP
+  #    - P4USER=$P4USER
+  #    - P4PASSWD=$P4PASSWD
+  #    - P4CASE=$P4CASE
+  #    - P4CHARSET=$P4CHARSET
+  #    - SERVICEUSER=$SERVICEUSER
+  #    - SERVICEGROUP=$SERVICEGROUP
 
   swarm.helix:
     build:
@@ -33,18 +51,27 @@ services:
     ports:
       - 5080:80
     depends_on:
-      - build.helix
-    tty: true
-
-  search.helix:
-    build:
-      context: p4-search
-      dockerfile: Dockerfile
-    hostname: search
-    domainname: helix
-    ports:
-      - 4088:8088
-      - 8983:8983
-    depends_on:
       - p4d.helix
     tty: true
+    environment:
+     - P4PORT=$P4PORT
+     - P4USER=$P4USER
+     - P4PASSWD=$P4PASSWD
+     - SWARMHOST=$SWARMHOST
+     - SWARMUSER=$SWARMUSER
+     - SWARMPASSWD=$SWARMPASSWD
+     - SWARMTOKEN=$SWARMTOKEN
+     - MAILHOST=$MAILHOST
+
+  # search.helix:
+  #   build:
+  #     context: p4-search
+  #     dockerfile: Dockerfile
+  #   hostname: search
+  #   domainname: helix
+  #   ports:
+  #     - 4088:8088
+  #     - 8983:8983
+  #   depends_on:
+  #     - p4d.helix
+  #   tty: true

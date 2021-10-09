@@ -2,17 +2,17 @@
 # Docker configuration for P4D
 # --------------------------------------------------------------------------------
 
-FROM ubuntu:xenial
+FROM ubuntu:focal
 
 LABEL vendor="Perforce Software"
-LABEL maintainer="Paul Allen (pallen@perforce.com)"
+LABEL maintainer="Mehdi Benadel (mehdi.benadel@gmail.com)"
 
 # Update Ubuntu and add Perforce Package Source
 RUN \
   apt-get update && \
-  apt-get install -y wget unzip vim  && \
+  DEBIAN_FRONTEND="noninteractive" apt-get install -y wget unzip gnupg  && \
   wget -qO - https://package.perforce.com/perforce.pubkey | apt-key add - && \
-  echo "deb http://package.perforce.com/apt/ubuntu xenial release" > /etc/apt/sources.list.d/perforce.list && \
+  echo "deb http://package.perforce.com/apt/ubuntu focal release" > /etc/apt/sources.list.d/perforce.list && \
   apt-get update
 
 # --------------------------------------------------------------------------------
@@ -20,12 +20,12 @@ RUN \
 # --------------------------------------------------------------------------------
 
 # Default Environment
-ARG P4NAME=master
-ARG P4TCP=1666
-ARG P4USER=super
-ARG P4PASSWD=Passw0rd
-ARG P4CASE=-C0
-ARG P4CHARSET=utf8
+ARG P4NAME
+ARG P4TCP
+ARG P4USER
+ARG P4PASSWD
+ARG P4CASE
+ARG P4CHARSET
 
 # Dynamic Environment
 ENV P4NAME=$P4NAME \
@@ -54,8 +54,8 @@ ENV P4ROOT=$P4HOME/root \
 
 # Create perforce user and install Perforce Server
 RUN \
-  apt-get install -y helix-p4d && \
-  apt-get install -y helix-swarm-triggers
+  DEBIAN_FRONTEND="noninteractive" apt-get install -y helix-p4d && \
+  DEBIAN_FRONTEND="noninteractive" apt-get install -y helix-swarm-triggers
 
 # Add external files
 COPY files/clean.sh /usr/local/bin/clean.sh
@@ -87,4 +87,4 @@ ENTRYPOINT \
 HEALTHCHECK \
   --interval=2m \
   --timeout=10s \
-  CMD p4 info -s > /dev/null || exit 1
+  CMD p4 -p $P4TCP info -s > /dev/null || exit 1

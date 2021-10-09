@@ -1,5 +1,11 @@
 #!/bin/bash
 
+sed -i "s|%SWARMHOST%|$SWARMHOST|g" /opt/perforce/swarm/data/config.php
+sed -i "s|%P4PORT%|$P4PORT|g" /opt/perforce/swarm/data/config.php
+sed -i "s|%SWARMUSER%|$SWARMUSER|g" /opt/perforce/swarm/data/config.php
+sed -i "s|%SWARMPASSWORD%|$SWARMPASSWORD|g" /opt/perforce/swarm/data/config.php
+sed -i "s|%MAILHOST%|$MAILHOST|g" /opt/perforce/swarm/data/config.php
+
 /opt/perforce/swarm/sbin/configure-swarm.sh --non-interactive \
     --p4port ${P4PORT} \
     --swarm-user ${SWARMUSER} --swarm-passwd ${SWARMPASSWD} \

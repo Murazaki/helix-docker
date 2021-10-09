@@ -1,16 +1,16 @@
 <?php
 return array(
     'environment' => array(
-        'hostname' => 'swarm.helix',
+        'hostname' => '%SWARMHOST%',
     ),
     'p4' => array(
-        'port' => 'p4d.helix:1666',
-        'user' => 'swarm',
-        'password' => 'Passw0rd',
+        'port' => '%P4PORT%',
+        'user' => '%SWARMUSER%',
+        'password' => '%SWARMPASSWORD%',
     ),
     'mail' => array(
         'transport' => array(
-            'host' => 'swarm.helix',
+            'host' => '%MAILHOST%',
         ),
     ),
     'security' => array(

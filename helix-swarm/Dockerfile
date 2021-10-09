@@ -2,38 +2,38 @@
 # Docker configuration for Swarm
 # --------------------------------------------------------------------------------
 
-FROM ubuntu:xenial
+FROM ubuntu:focal
 
 LABEL vendor="Perforce Software"
-LABEL maintainer="Paul Allen (pallen@perforce.com)"
+LABEL maintainer="Mehdi Benadel (mehdi.benadel@gmail.com)"
 
 # Update Ubuntu and add Perforce Package Source
 RUN \
   apt-get update  && \
-  apt-get install -y wget curl unzip vim && \
+  DEBIAN_FRONTEND="noninteractive" apt-get install -y wget curl unzip gnupg && \
   wget -qO - https://package.perforce.com/perforce.pubkey | apt-key add - && \
-  echo "deb http://package.perforce.com/apt/ubuntu xenial release" > /etc/apt/sources.list.d/perforce.list && \
+  echo "deb http://package.perforce.com/apt/ubuntu focal release" > /etc/apt/sources.list.d/perforce.list && \
   apt-get update
 
 # Create swarm user and install Helix Swarm
 RUN \
   useradd --user-group --home-dir /home/swarm --create-home --uid 1000 swarm && \
-  apt-get install -y helix-cli && \
-  apt-get install -y -f helix-swarm=2019.1-1829459~xenial
+  DEBIAN_FRONTEND="noninteractive" apt-get install -y helix-cli && \
+  DEBIAN_FRONTEND="noninteractive" apt-get install -y -f helix-swarm
 
 # --------------------------------------------------------------------------------
 # Docker ENVIRONMENT
 # --------------------------------------------------------------------------------
 
 # Default Environment
-ARG P4PORT=p4d.helix:1666
-ARG P4USER=super
-ARG P4PASSWD=Passw0rd
-ARG SWARMHOST=swarm.helix
-ARG SWARMUSER=swarm
-ARG SWARMPASSWD=$P4PASSWD
-ARG SWARMTOKEN=00000000-0000-0000-0000-000000000000
-ARG MAILHOST=swarm.helix
+ARG P4PORT
+ARG P4USER
+ARG P4PASSWD
+ARG SWARMHOST
+ARG SWARMUSER
+ARG SWARMPASSWD
+ARG SWARMTOKEN
+ARG MAILHOST
 
 # Configure Swarm Environment
 ENV P4PORT=$P4PORT \
@@ -73,7 +73,7 @@ USER root
 ENTRYPOINT \
     until p4 info -s 2> /dev/null; do sleep 1; done && \
 	echo "Perforce Server [FOUND]" && \
-	until p4 -p build.helix:1666 info -s 2> /dev/null; do sleep 1; done && \
+	until p4 -p p4d.helix:1666 info -s 2> /dev/null; do sleep 1; done && \
 	echo "Build Server [FOUND]" && \
 	cron start && \
 	/opt/perforce/swarm/setup.sh && \
