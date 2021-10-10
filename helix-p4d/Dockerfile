@@ -26,6 +26,7 @@ ARG P4USER
 ARG P4PASSWD
 ARG P4CASE
 ARG P4CHARSET
+ARG SECURITY
 
 # Dynamic Environment
 ENV P4NAME=$P4NAME \
@@ -35,6 +36,7 @@ ENV P4NAME=$P4NAME \
   P4PASSWD=$P4PASSWD \
   P4CASE=$P4CASE \
   P4CHARSET=$P4CHARSET \
+  SECURITY=$SECURITY \
   JNL_PREFIX=$P4NAME
 
 # Base Environment
@@ -60,14 +62,14 @@ RUN \
 # Add external files
 COPY files/clean.sh /usr/local/bin/clean.sh
 COPY files/restore.sh /usr/local/bin/restore.sh
-COPY files/empty_setup.sh /usr/local/bin/empty_setup.sh
+COPY files/setup.sh /usr/local/bin/setup.sh
 COPY files/init.sh /usr/local/bin/init.sh
 COPY files/latest_checkpoint.sh /usr/local/bin/latest_checkpoint.sh
 
 RUN \
   chmod +x /usr/local/bin/clean.sh && \
   chmod +x /usr/local/bin/restore.sh && \
-  chmod +x /usr/local/bin/empty_setup.sh && \
+  chmod +x /usr/local/bin/setup.sh && \
   chmod +x /usr/local/bin/init.sh && \
   chmod +x /usr/local/bin/latest_checkpoint.sh
 
@@ -82,7 +84,7 @@ VOLUME $P4HOME
 
 ENTRYPOINT \
   init.sh && \
-  bash
+  tail -f $P4LOGDIR/p4d.log
 
 HEALTHCHECK \
   --interval=2m \

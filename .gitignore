@@ -1,5 +1,4 @@
-*.iml
-.idea/
+.vs/
 data/
-test/
+tmp/
 .env

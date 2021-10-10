@@ -1,4 +1,5 @@
 #!/bin/bash
+set -x
 
 ## Test for latest link
 if [ ! -L $P4CKP/latest ]; then
@@ -27,7 +28,7 @@ p4d $P4CASE -r $P4ROOT -jr -z $P4CKP/latest
 p4d $P4CASE -r $P4ROOT -xu
 
 ## Set key environment variables
-p4d $P4CASE -r $P4ROOT "-cset security=2"
+p4d $P4CASE -r $P4ROOT "-cset security=${SECURITY}"
 p4d $P4CASE -r $P4ROOT "-cset ${P4NAME}#server.depot.root=${P4DEPOTS}"
 p4d $P4CASE -r $P4ROOT "-cset ${P4NAME}#journalPrefix=${P4CKP}/${JNL_PREFIX}"
 

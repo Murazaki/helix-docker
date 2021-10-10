@@ -1,4 +1,5 @@
 #!/bin/bash
+set -x
 
 # Setup directories
 mkdir -p $P4ROOT
@@ -13,7 +14,7 @@ if [ -L $P4CKP/latest ]; then
 	rm $P4CKP/latest
 else
 	echo "Create empty or start existing server..."
-	empty_setup.sh
+	setup.sh
 fi
 
 echo "Perforce Server starting..."

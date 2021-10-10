@@ -19,28 +19,18 @@ services:
     - P4PASSWD=$P4PASSWD
     - P4CASE=$P4CASE
     - P4CHARSET=$P4CHARSET
+    - SECURITY=$SECURITY
 
-  # build.helix:
-  #   build:
-  #     context: helix-build
-  #     dockerfile: Dockerfile
-  #   hostname: build
-  #   domainname: helix
-  #   ports:
-  #     - 4001:1666
-  #   depends_on:
-  #     - p4d.helix
-  #   tty: true
-  #   environment:
-  #    - P4NAME=$P4NAME
-  #    - P4PORT=$P4PORT
-  #    - P4TCP=$P4TCP
-  #    - P4USER=$P4USER
-  #    - P4PASSWD=$P4PASSWD
-  #    - P4CASE=$P4CASE
-  #    - P4CHARSET=$P4CHARSET
-  #    - SERVICEUSER=$SERVICEUSER
-  #    - SERVICEGROUP=$SERVICEGROUP
+  redis.helix:
+    image: redis:alpine
+    command: redis-server --requirepass ${REDISPASSWORD}
+    hostname: redis
+    domainname: helix
+    expose:
+     - 6379
+    volumes:
+     - ./tmp/redis:/data
+     - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
 
   swarm.helix:
     build:
@@ -51,6 +41,7 @@ services:
     ports:
       - 5080:80
     depends_on:
+      - redis.helix
       - p4d.helix
     tty: true
     environment:
@@ -61,17 +52,6 @@ services:
      - SWARMUSER=$SWARMUSER
      - SWARMPASSWD=$SWARMPASSWD
      - SWARMTOKEN=$SWARMTOKEN
+     - REDISPASSWORD=$REDISPASSWORD
      - MAILHOST=$MAILHOST
-
-  # search.helix:
-  #   build:
-  #     context: p4-search
-  #     dockerfile: Dockerfile
-  #   hostname: search
-  #   domainname: helix
-  #   ports:
-  #     - 4088:8088
-  #     - 8983:8983
-  #   depends_on:
-  #     - p4d.helix
-  #   tty: true
+     - BASE_URL=$BASE_URL

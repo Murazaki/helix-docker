@@ -1,4 +1,5 @@
 #!/bin/bash
+set -x
 
 ## Take password as arg or use default
 P4PASSWD=${1:-Password!}

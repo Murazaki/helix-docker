@@ -33,7 +33,9 @@ ARG SWARMHOST
 ARG SWARMUSER
 ARG SWARMPASSWD
 ARG SWARMTOKEN
+ARG REDISPASSWORD
 ARG MAILHOST
+ARG BASE_URL
 
 # Configure Swarm Environment
 ENV P4PORT=$P4PORT \
@@ -43,7 +45,9 @@ ENV P4PORT=$P4PORT \
   SWARMUSER=$SWARMUSER \
   SWARMPASSWD=$SWARMPASSWD \
   SWARMTOKEN=$SWARMTOKEN \
-  MAILHOST=$MAILHOST
+  REDISPASSWORD=$REDISPASSWORD \
+  MAILHOST=$MAILHOST \
+  BASE_URL=$BASE_URL
 
 EXPOSE 80
 
@@ -59,12 +63,6 @@ RUN \
 	mkdir -p /opt/perforce/swarm/data/queue/tokens && \
 	touch /opt/perforce/swarm/data/queue/tokens/$SWARMTOKEN
 
-USER swarm
-COPY files/swarm.p4s /home/swarm/swarm.p4s
-COPY files/client.p4s /home/swarm/client.p4s
-COPY files/swarm-trigger.pl /home/swarm/swarm-trigger.pl
-COPY files/swarm-trigger.conf /home/swarm/swarm-trigger.conf
-
 # --------------------------------------------------------------------------------
 # Docker RUN
 # --------------------------------------------------------------------------------
@@ -77,7 +75,8 @@ ENTRYPOINT \
 	echo "Build Server [FOUND]" && \
 	cron start && \
 	/opt/perforce/swarm/setup.sh && \
-	bash
+  while [ ! -f /opt/perforce/swarm/data/log ]; do sleep 1; done && \
+  tail -f /opt/perforce/swarm/data/log
 
 HEALTHCHECK \
 	--interval=2m \
