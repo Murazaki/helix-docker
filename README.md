@@ -2,6 +2,8 @@
 
 Running a Perforce Server with Swarm.
 
+Based on https://github.com/p4paul/helix-docker (BSD Perforce Copyright still applies)
+
 ## Build and Run
 
 	docker-compose build
