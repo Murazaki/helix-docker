@@ -29,6 +29,6 @@ return array(
         ),
     ),
     'security' => array(
-        'require_login' => false, // defaults to true
+        'require_login' => true, // defaults to true
     ),
 );

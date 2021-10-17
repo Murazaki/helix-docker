@@ -4,54 +4,101 @@ services:
     build:
       context: helix-p4d
       dockerfile: Dockerfile
+    restart: always
+    container_name: p4d.helix
     hostname: p4d
     domainname: helix
     ports:
-      - 4000:1666
+      - 1666:1666
     volumes:
       - ./data/helix-p4d:/p4
     tty: true
     environment:
-    - P4NAME=$P4NAME
-    - P4TCP=$P4TCP
-    - P4PORT=$P4TCP
-    - P4USER=$P4USER
-    - P4PASSWD=$P4PASSWD
-    - P4CASE=$P4CASE
-    - P4CHARSET=$P4CHARSET
-    - SECURITY=$SECURITY
+      P4NAME: $P4NAME
+      P4TCP: $P4TCP
+      P4PORT: $P4TCP
+      P4USER_FILE: /run/secrets/helix_p4_user
+      P4PASSWD_FILE: /run/secrets/helix_p4_password
+      P4CASE: $P4CASE
+      P4CHARSET: $P4CHARSET
+      SECURITY: $SECURITY
+    secrets:
+      - helix_p4_user
+      - helix_p4_password
 
   redis.helix:
     image: redis:alpine
-    command: redis-server --requirepass ${REDISPASSWORD}
+    restart: always
+    container_name: redis.helix
     hostname: redis
     domainname: helix
-    expose:
-     - 6379
     volumes:
      - ./tmp/redis:/data
      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
+    environment:
+      REDIS_HOST_PASSWORD_FILE: /run/secrets/helix_redis_host_password
+    command: [
+      "sh", "-c",
+      '
+       docker-entrypoint.sh
+       --requirepass "$$(cat $$REDIS_HOST_PASSWORD_FILE)"
+      '
+    ]
+    secrets:
+      - helix_redis_host_password
 
   swarm.helix:
     build:
       context: helix-swarm
       dockerfile: Dockerfile
+    restart: always
+    container_name: swarm.helix
     hostname: swarm
     domainname: helix
-    ports:
-      - 5080:80
     depends_on:
       - redis.helix
       - p4d.helix
     tty: true
     environment:
-     - P4PORT=$P4PORT
-     - P4USER=$P4USER
-     - P4PASSWD=$P4PASSWD
-     - SWARMHOST=$SWARMHOST
-     - SWARMUSER=$SWARMUSER
-     - SWARMPASSWD=$SWARMPASSWD
-     - SWARMTOKEN=$SWARMTOKEN
-     - REDISPASSWORD=$REDISPASSWORD
-     - MAILHOST=$MAILHOST
-     - BASE_URL=$BASE_URL
+      P4PORT: $P4PORT
+      P4USER_FILE: /run/secrets/helix_p4_user
+      P4PASSWD_FILE: /run/secrets/helix_p4_password
+      SWARMHOST: $SWARMHOST
+      SWARMUSER_FILE: /run/secrets/helix_swarm_user
+      SWARMPASSWD_FILE: /run/secrets/helix_swarm_password
+      SWARMTOKEN_FILE: /run/secrets/helix_swarm_token
+      REDISPASSWORD_FILE: /run/secrets/helix_redis_host_password
+      MAILHOST: $MAILHOST
+      BASE_URL: $BASE_URL
+      # for use with nginx proxy from https://github.com/evertramos/nginx-proxy-automation
+      VIRTUAL_PORT: 80
+      VIRTUAL_HOST: $BASE_URL
+      LETSENCRYPT_HOST: $BASE_URL
+      LETSENCRYPT_EMAIL: $EMAIL
+      NETWORK: $NETWORK
+    secrets:
+      - helix_p4_user
+      - helix_p4_password
+      - helix_swarm_user
+      - helix_swarm_password
+      - helix_swarm_token
+      - helix_redis_host_password
+
+secrets:
+  helix_p4_user:
+    file: ./helix_p4_user.txt # put admin password to this file
+  helix_p4_password:
+    file: ./helix_p4_password.txt # put admin username to this file
+  helix_swarm_user:
+    file: ./helix_swarm_user.txt # put swarm user to this file
+  helix_swarm_password:
+    file: ./helix_swarm_password.txt # put swarm password to this file
+  helix_swarm_token:
+    file: ./helix_swarm_token.txt # put swarm token to this file
+  helix_redis_host_password:
+    file: ./helix_redis_host_password.txt # put redis password to this file
+
+networks:
+    default:
+      external: true
+      name: $NETWORK

@@ -69,7 +69,7 @@ RUN \
 
 USER root
 ENTRYPOINT \
-    until p4 info -s 2> /dev/null; do sleep 1; done && \
+        until p4 info -s 2> /dev/null; do sleep 1; done && \
 	echo "Perforce Server [FOUND]" && \
 	until p4 -p p4d.helix:1666 info -s 2> /dev/null; do sleep 1; done && \
 	echo "Build Server [FOUND]" && \

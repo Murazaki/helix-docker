@@ -1,4 +1,11 @@
-.vs/
-data/
-tmp/
+.vs
+data
+tmp
 .env
+
+helix_swarm_user.txt
+helix_p4_password.txt
+helix_p4_user.txt
+helix_redis_host_password.txt
+helix_swarm_password.txt
+helix_swarm_token.txt
